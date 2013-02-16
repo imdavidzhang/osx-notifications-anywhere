@@ -41,7 +41,7 @@ get '/register' do
     user = User.first(:user_id => random_str)
     unless(!user.nil?)
       user= User.new(:user_id => random_str)
-      return random_str if user.save
+      return {:token => random_str, :message => ""}.to_json if user.save
     end
     tries -= 1
   end
