@@ -18,15 +18,37 @@ def connect
   Message.auto_upgrade!
 end
 
-get '/put' do
+post '/put' do
   connect
-  "Hello, world2"
+  user = User.first(:user_id => params[:user])
+  unless user.nil?
+    msg = Message.new(:title => params[:title],
+                      :subtext => params[:subtext],
+                      :group => params[:group],
+                      :body => params[:message],
+                      :user_id => user.id,
+                      :status => 0)
+    if(msg.save)
+      return {:message => '', :success => true}.to_json
+    else
+      return {:message => 'save failed'}.to_json
+    end
+  end
 end
 
 get '/get' do
   connect
-  puts "abcde"
-  "Hello, world3"
+  user = User.first(:user_id => params[:user])
+  range = params[:last_message_id] || -1
+
+  unless user.nil?
+    token = user.id
+    
+    messages = Message.all(:user_id => token, :id.gt => range)
+    return messages.to_json
+  end
+
+  return { 'message' => 'token not found' }.to_json
 end
 
 get '/register' do

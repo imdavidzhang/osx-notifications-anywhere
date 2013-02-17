@@ -2,56 +2,8 @@ require 'optparse'
 require 'json'
 require 'pp'
 require 'net/http'
-
-def parse_config
-  parsed = config_path 
-  parsed_options = {}
-  begin
-    config_text = IO.read(parsed)
-    parsed_options = JSON.parse(config_text)
-  rescue
-  end
-
-  return parsed_options
-end
-
-def write_config(config)
-  File.open(config_path, 'w+') do |f|
-    f.puts(config.to_json)
-  end
-end
-
-def set_token(resp)
-  token = resp['token']
-  if(!token.nil?)
-    existing_config = parse_config 
-    existing_config['token'] = token
-    write_config(existing_config)
-  end
-
-end
-
-def make_request(url, flags)
-  begin
-    url = URI.parse(url)
-    req = Net::HTTP::Get.new(url.to_s)
-    res = Net::HTTP.start(url.host, url.port) {|http|
-      http.request(req)
-    }
-    
-   return JSON.parse(res.body)
-  rescue => ex
-    puts ex
-  end
-end
-
-def set_defaults(options)
-  options[:url] ||= 'http://ona.herokuapp.com/'
-end
-
-def config_path
-  "#{File.expand_path('~')}/.ona.conf"
-end
+require './osa_config'
+require './request'
 
 options = {}
 
@@ -65,22 +17,28 @@ end
 
 optparse.parse!
 
-config = parse_config
-set_defaults(config)
+config = OnaConfig.new('pull')
 
-puts 
 if(options[:register])
-  if(config['token'] && !config['force'])
-    puts "already registered: #{config['token']}"
+  if(config.token)
+    puts "already registered: #{config.token}"
     exit
   end
 
-  resp = make_request(config[:url] + options[:path], {}) 
+  resp = make_request(config.base + options[:path], {}) 
 
   if(!resp.nil?)
     puts "registered: #{resp['token']}"
-    set_token(resp)
+    config.token = resp['token']
+    config.write
   end
 elsif(options[:pull])
-
+  resp = make_request(config.base + 'get', {:user => config.token, :last_message_id => config.last_message_id}, :get)
+  highest_resp = resp.max_by { |x| x['id'] }
+  
+  unless highest_resp.nil?
+    highest_id = highest_resp['id']
+    config.last_message_id = highest_id 
+    config.write
+  end
 end

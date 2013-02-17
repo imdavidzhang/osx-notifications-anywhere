@@ -1,4 +1,5 @@
 require 'data_mapper'
+require './user'
 class Message
   include DataMapper::Resource
 
@@ -8,6 +9,7 @@ class Message
   property :body, Text
   property :group, String
   property :created_at, DateTime
+  property :status, String
 
-  belongs_to :user
+  belongs_to :user, :key => true
 end
