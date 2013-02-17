@@ -8,7 +8,6 @@ def make_request(url, flags, method=:post)
       req.set_form_data(flags)
     else
       full_url = url.to_s + '?' + flags.map { |pair| pair[0].to_s + '=' + pair[1].to_s }.join("&")
-      puts "full url: #{full_url}"
       req = Net::HTTP::Get.new(full_url)
     end
 
