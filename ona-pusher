@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'optparse'
 require 'pp'
 require 'json'
@@ -17,6 +19,9 @@ optparse = OptionParser.new do |opts|
   opts.on('-g', '--group GROUP', 'Group') do |v|
     options[:group] = v
   end
+  opts.on('-m', '--message MESSAGE', 'Message') do |m|
+    options[:message] = m
+  end
 end
 
 
@@ -30,8 +35,10 @@ else
   token = config.token
   puts "z"
   unless token.nil?
-    message = STDIN.read
-    options[:message] = message
+    if(!options[:message])
+      options[:message] = STDIN.read
+    end
+
     options[:title] ||= '(no title)'
     options[:subtext] ||= '(no subtext)'
     options[:group] ||= 'default'
