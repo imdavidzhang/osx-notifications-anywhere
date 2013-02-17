@@ -3,8 +3,8 @@
 require 'optparse'
 require 'pp'
 require 'json'
-require './ona_config'
-require './request'
+require '../ona_config'
+require '../request'
 options = {}
 optparse = OptionParser.new do |opts|
   opts.on('-u', '--token TOKEN', 'Set token') do |v|

@@ -4,8 +4,8 @@ require 'optparse'
 require 'json'
 require 'pp'
 require 'net/http'
-require './ona_config'
-require './request'
+require '../ona_config'
+require '../request'
 require 'terminal-notifier'
 
 def process(config, options)
