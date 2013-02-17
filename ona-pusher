@@ -3,7 +3,7 @@
 require 'optparse'
 require 'pp'
 require 'json'
-require './osa_config'
+require './ona_config'
 require './request'
 options = {}
 optparse = OptionParser.new do |opts|
