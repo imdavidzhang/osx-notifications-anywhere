@@ -50,12 +50,13 @@ def set_defaults(options)
 end
 
 def config_path
-  "#{File.expand_path('~')}/.ona"
+  "#{File.expand_path('~')}/.ona.conf"
 end
 
 options = {}
 
 optparse = OptionParser.new do |opts|
+  options[:pull] = true
   opts.on('-r', '--register', 'Register token') do
     options[:register] = true
     options[:path] = 'register'
@@ -67,16 +68,19 @@ optparse.parse!
 config = parse_config
 set_defaults(config)
 
+puts 
 if(options[:register])
   if(config['token'] && !config['force'])
     puts "already registered: #{config['token']}"
     exit
   end
 
-
   resp = make_request(config[:url] + options[:path], {}) 
 
   if(!resp.nil?)
+    puts "registered: #{resp['token']}"
     set_token(resp)
   end
+elsif(options[:pull])
+
 end
